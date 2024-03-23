@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 import pickle
 import numpy as np
 
@@ -9,7 +10,8 @@ y = df['Disease'].to_numpy()
 labels = np.sort(np.unique(y))
 y = np.array([np.where(labels == x) for x in y]).flatten()
 
-model = LogisticRegression().fit(X, y)
+#model = LogisticRegression().fit(X, y)
+model = RandomForestClassifier(random_state=42).fit(X,y)
 
 with open("model.pkl", 'wb') as f:
     pickle.dump(model, f)
