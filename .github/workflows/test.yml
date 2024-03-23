@@ -9,7 +9,6 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.name == 'Train' && github.event.workflow_run.conclusion == 'success'  # Only run if the Train workflow succeeded
 
     steps:
       - name: Checkout Repository
