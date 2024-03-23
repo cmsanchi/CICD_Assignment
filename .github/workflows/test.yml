@@ -9,6 +9,7 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     needs: build-and-push
+    if: success()  # Only run if the "build-and-push" job succeeds
 
     steps:
       - uses: actions/checkout@v3
@@ -17,4 +18,13 @@ jobs:
         run: docker pull cmsanchi/CICD_Assignment:latest
 
       - name: Run tests in Docker container
-        run: docker run --rm cmsanchi/CICD_Assignment:latest python test.py
+        run: |
+          OUTPUT=$(docker run --rm cmsanchi/CICD_Assignment:latest python test.py)
+          echo "Score: $OUTPUT"
+          if [ $(echo "$OUTPUT > 0.50" | bc) -eq 1 ]; then
+            echo "Test Passed"
+          else
+            echo "Test Failed"
+            exit 1
+          fi
+
