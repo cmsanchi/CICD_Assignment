@@ -27,5 +27,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: cmsanchi/CICD_Assignment:latest
-
+          tags: cmsanchi/cicd_assignment:latest
