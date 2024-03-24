@@ -2,29 +2,26 @@ name: Test
 
 on:
   pull_request:
-    branches:
-      - main
-  workflow_run:
-    workflows: ["Train"]
-    types: [completed]
+    branches: [ "main" ]
 
 jobs:
-  run-tests:
+  pull_and_test:
+    name: Pull Docker Image and Test
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_run' && github.event.workflow == 'Train' && github.event.workflow_run.conclusion == 'success' || github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
-
+    needs: Train
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
       - name: Pull Docker Image
-        run: docker pull cmsanchi/cicd_assignment:latest
+        run: docker pull cmsanchi/ci_cd_assignment:v1
 
-      - name: Run tests in Docker container
+      - name: Run Tests
         run: |
-          OUTPUT=$(docker run --rm cmsanchi/cicd_assignment:latest python test.py)
-          echo "Score: $OUTPUT"
-          if [ $(echo "$OUTPUT > 0.50" | bc) -eq 1 ]; then
+          OUTPUT=$(docker run --rm cmsanchi/ci_cd_assignment:v1 python test.py)
+          echo "Score:"
+          echo "$OUTPUT"
+          if [[ `echo "$OUTPUT > 0.50" | bc` -eq 1 ]]; then
             echo "Test Passed"
           else
             echo "Test Failed"
