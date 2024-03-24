@@ -2,28 +2,27 @@ name: Test
 
 on:
   pull_request:
-    branches:
+    branches: 
       - main
-  workflow_run:
-    workflows: ["Train"]
-    types: [completed]
-jobs:
-  run-tests:
-    runs-on: ubuntu-latest
-    if: github.event.workflow_run.name == 'Train' && github.event.workflow_run.conclusion == 'success'  # Only run if the Train workflow succeeded
 
+jobs:
+  Train:
+    uses: ./.github/workflows/train.yml
+    secrets: inherit
+
+  pull_and_test:
+    name: pull_and_test
+    needs: [Train]
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
       - name: Pull Docker Image
-        run: docker pull cmsanchi/cicd_assignment:latest
-      - name: Run tests in Docker container
+        run: docker pull cmsanchi/ci_cd_assignment:v1
+      
+      - name: Run Tests
         run: |
-          OUTPUT=$(docker run --rm cmsanchi/cicd_assignment:latest python test.py)
-          echo "Score: $OUTPUT"
-          if [ $(echo "$OUTPUT > 0.50" | bc) -eq 1 ]; then
-            echo "Test Passed"
-          else
-            echo "Test Failed"
-            exit 1
+          OUTPUT=$(docker run --rm cmsanchi/ci_cd_assignment:v1)
+          echo "Score:"
+          echo "$OUTPUT"
+          if [[ `echo "$OUTPUT 0.50" | awk '{print ($1 < $2)}'` == 1 ]]; then 
+            echo "Insufficient Accuracy" && exit 1
           fi
