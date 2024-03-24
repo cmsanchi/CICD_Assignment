@@ -11,7 +11,7 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.name == 'Train' && github.event.workflow_run.conclusion == 'success'  # Only run if the Train workflow succeeded
+    if: github.event_name == 'workflow_run' && github.event.workflow == 'Train' && github.event.workflow_run.conclusion == 'success' || github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
 
     steps:
       - name: Checkout Repository
@@ -30,4 +30,3 @@ jobs:
             echo "Test Failed"
             exit 1
           fi
-
